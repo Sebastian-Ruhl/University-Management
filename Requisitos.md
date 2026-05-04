@@ -10,7 +10,7 @@
 
 **RF03** — El sistema debe permitir al administrador crear empleados con un rol específico.
 
-**RF04** — El sistema debe listar, modificar y desactivar empleados del restaurante.
+**RF04** — El sistema debe poder realizar un ABM de empleados del restaurante.
 
 **RF05** — El sistema debe validar que no se supere el límite de usuarios según el plan contratado.
 
@@ -26,7 +26,7 @@
 
 **RF09** — El sistema debe gestionar el ciclo de vida de una suscripción (pendiente, activa, vencida o cancelada).
 
-**RF10** — El sistema debe integrarse con Mercado Pago para procesar pagos de suscripciones.
+**RF10** — El sistema debe poder registrar pagos de suscripciones.
 
 **RF11** — El sistema debe procesar las notificaciones enviadas por Mercado Pago.
 
@@ -143,3 +143,5 @@
 **RF55** — El sistema debe generar un reporte de ingresos por método de pago.
 
 **RF56** — El sistema debe listar los empleados con más pedidos atendidos en un período.
+
+
