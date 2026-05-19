@@ -1,0 +1,142 @@
+
+<div id="erd" style="padding:8px 0"></div>
+<style>
+#erd svg.erDiagram .divider path { stroke-opacity: 0.5; }
+#erd svg.erDiagram .row-rect-odd path,
+#erd svg.erDiagram .row-rect-odd rect,
+#erd svg.erDiagram .row-rect-even path,
+#erd svg.erDiagram .row-rect-even rect { stroke: none !important; }
+</style>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const { svg } = await mermaid.render('erd-svg', `erDiagram
+    PERSONA {
+        long id PK
+        string nombre
+        string apellido
+        string dni UK
+        string email UK
+        string telefono
+    }
+    CUENTA_USUARIO {
+        long id PK
+        long persona_id FK
+        string email_login UK
+        string password
+        enum rol
+        enum estado
+    }
+    ALUMNO {
+        long id PK
+        long persona_id FK
+        string legajo UK
+        date fecha_ingreso
+        enum estado_alumno
+    }
+    DOCENTE {
+        long id PK
+        long persona_id FK
+        string numero_docente UK
+        enum categoria
+        boolean activo
+    }
+    MATERIA {
+        long id PK
+        string codigo UK
+        string nombre
+        int anio
+        int cuatrimestre
+        int carga_horaria
+    }
+    CORRELATIVIDAD {
+        long id PK
+        long materia_id FK
+        long materia_req_id FK
+        enum tipo
+    }
+    COMISION {
+        long id PK
+        long materia_id FK
+        string nombre
+        int anio_lectivo
+        int cuatrimestre
+        enum turno
+        int cupo_maximo
+        enum estado
+    }
+    ASIGNACION_DOCENTE {
+        long id PK
+        long comision_id FK
+        long docente_id FK
+        enum rol
+        date fecha_asignacion
+    }
+    INSCRIPCION {
+        long id PK
+        long alumno_id FK
+        long comision_id FK
+        datetime fecha
+        enum estado_cursada
+        double nota_final
+    }
+    NOTA_EXAMEN {
+        long id PK
+        long alumno_id FK
+        long materia_id FK
+        long docente_id FK
+        enum tipo_examen
+        double nota
+        date fecha
+    }
+
+    PERSONA ||--o| CUENTA_USUARIO : "tiene"
+    PERSONA ||--o| ALUMNO : "es"
+    PERSONA ||--o| DOCENTE : "es"
+    MATERIA ||--o{ CORRELATIVIDAD : "requiere"
+    MATERIA ||--o{ COMISION : "se dicta en"
+    COMISION ||--o{ ASIGNACION_DOCENTE : "tiene"
+    DOCENTE ||--o{ ASIGNACION_DOCENTE : "asignado a"
+    ALUMNO ||--o{ INSCRIPCION : "se inscribe"
+    COMISION ||--o{ INSCRIPCION : "contiene"
+    ALUMNO ||--o{ NOTA_EXAMEN : "rinde"
+    MATERIA ||--o{ NOTA_EXAMEN : "es evaluada en"
+    DOCENTE ||--o{ NOTA_EXAMEN : "carga"
+`);
+document.getElementById('erd').innerHTML = svg;
+document.querySelectorAll('#erd svg.erDiagram .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+document.querySelectorAll('#erd svg.erDiagram .row-rect-odd path, #erd svg.erDiagram .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>
