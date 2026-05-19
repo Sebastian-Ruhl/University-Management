@@ -37,9 +37,6 @@ public class CourseSectionEntity {
     @Column(nullable = false)
     private Shift turno;
 
-    @Column(name = "aula_predeterminada")
-    private String aulaPredeterminada;
-
     @Column(name = "cupo_maximo")
     private Integer cupoMaximo;
 
@@ -47,19 +44,8 @@ public class CourseSectionEntity {
     @Column(nullable = false)
     private SectionStatus estado;
 
-    @ManyToMany
-    @JoinTable(
-            name = "comision_horario",
-            joinColumns = @JoinColumn(name = "id_comision"),
-            inverseJoinColumns = @JoinColumn(name = "id_horario")
-    )
-    private List<ScheduleEntity> horarios = new ArrayList<>();
-
     @OneToMany(mappedBy = "comision")
     private List<EnrollmentEntity> inscripciones = new ArrayList<>();
-
-    @OneToMany(mappedBy = "comision")
-    private List<ClassSessionEntity> clases = new ArrayList<>();
 
     @OneToMany(mappedBy = "comision")
     private List<ProfessorAssignmentEntity> asignacionesDocente = new ArrayList<>();

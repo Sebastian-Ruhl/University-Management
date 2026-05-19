@@ -1,6 +1,5 @@
 package Proyect.UniversityManagement.model;
 
-import Proyect.UniversityManagement.enums.AcademicCondition;
 import Proyect.UniversityManagement.enums.EnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,13 +32,6 @@ public class EnrollmentEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_cursada", nullable = false)
     private EnrollmentStatus estadoCursada;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AcademicCondition condicion;
-
-    @Column(name = "porcentaje_asistencia")
-    private Double porcentajeAsistencia;
 
     @Column(name = "nota_final_cursada")
     private Double notaFinalCursada;

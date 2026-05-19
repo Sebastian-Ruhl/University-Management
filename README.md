@@ -20,17 +20,16 @@ Sistema de Gestión Académica universitaria. API RESTful desarrollada con **Spr
 
 ## Descripción del Proyecto
 
-Sistema que permite gestionar integralmente las operaciones académicas de una universidad a través de una API RESTful. Administra estudiantes, profesores, materias, comisiones, inscripciones, asistencias, exámenes y horarios.
+Sistema que permite gestionar las operaciones académicas de una universidad a través de una API RESTful. Administra personas, alumnos, docentes, materias, comisiones, inscripciones, exámenes y correlatividades.
 
 ### Funcionalidades principales
 
-- **Gestión de personas**: estudiantes, profesores y personal administrativo con datos personales y académicos.
-- **Gestión de carreras y materias**: ABM de planes de estudio, correlatividades y requisitos.
-- **Gestión de comisiones**: apertura de cursadas por cuatrimestre, asignación de profesores y horarios.
-- **Gestión de inscripciones**: inscripción de estudiantes a comisiones con validación de correlatividades.
-- **Gestión de asistencias**: registro de asistencia por clase, control de condición académica.
+- **Gestión de personas**: alumnos y docentes con datos personales y académicos.
+- **Gestión de materias**: ABM de materias, correlatividades y requisitos.
+- **Gestión de comisiones**: apertura de cursadas por cuatrimestre, asignación de docentes.
+- **Gestión de inscripciones**: inscripción de alumnos a comisiones con validación de correlatividades.
 - **Gestión de exámenes y notas**: carga de notas de parciales, finales y recuperatorios.
-- **Autenticación y roles**: acceso segmentado por rol (ADMIN, STUDENT, PROFESSOR, STAFF).
+- **Autenticación y roles**: acceso segmentado por rol (ALUMNO, DOCENTE, ADMINISTRATIVO, SYSADMIN).
 
 ---
 
@@ -90,57 +89,48 @@ Cliente (Postman / Frontend / Swagger UI)
 
 ## Modelo de Datos
 
-El sistema cuenta con **15 entidades** distribuidas en 5 módulos:
+El sistema cuenta con **10 entidades** distribuidas en 4 módulos:
 
 ### Módulo de Personas
-- **PersonEntity** — Entidad base con datos personales (nombre, documento, contacto)
-- **StudentEntity** — Datos específicos del alumno (legajo, estado, condición académica)
-- **ProfessorEntity** — Datos específicos del profesor (categoría, dedicación)
-- **AdministrativeStaffEntity** — Datos del personal administrativo
-- **UserAccountEntity** — Credenciales de acceso (email, contraseña, rol)
+- **PersonEntity** — Entidad base con datos personales (dni, nombre, apellido, email, teléfono)
+- **StudentEntity** — Perfil de alumno (legajo, fecha de ingreso, estado)
+- **ProfessorEntity** — Perfil de docente (número de docente, categoría)
+- **UserAccountEntity** — Credenciales de acceso (email de login, contraseña, rol, estado)
 
 ### Módulo Académico
-- **DegreeEntity** — Carreras universitarias
-- **SubjectEntity** — Materias dentro de una carrera
-- **PrerequisiteEntity** — Correlatividades entre materias
+- **SubjectEntity** — Materias (código, nombre, año, cuatrimestre, carga horaria)
+- **PrerequisiteEntity** — Correlatividades entre materias (tipo de requisito)
 
 ### Módulo de Cursada
-- **CourseSectionEntity** — Comisiones abiertas en un cuatrimestre
-- **ScheduleEntity** — Horarios semanales de una comisión
-- **ClassSessionEntity** — Clases individuales dictadas
-- **ProfessorAssignmentEntity** — Asignación de profesores a comisiones
+- **CourseSectionEntity** — Comisiones abiertas en un cuatrimestre (turno, cupo, estado)
+- **ProfessorAssignmentEntity** — Asignación de docentes a comisiones (rol, fecha)
 
 ### Módulo de Alumnos
-- **EnrollmentEntity** — Inscripción de un alumno a una comisión
-- **AttendanceEntity** — Asistencia a clases
-- **ExamGradeEntity** — Notas de exámenes
+- **EnrollmentEntity** — Inscripción de un alumno a una comisión (estado, nota final)
+- **ExamGradeEntity** — Notas de exámenes (tipo, valor numérico, fecha)
 
 ### Diagrama de relaciones
 
 ```
-PersonEntity ───1:1─── StudentEntity
-    │                    │
-    ├──1:1─── ProfessorEntity
-    │                    │
-    ├──1:1─── AdministrativeStaffEntity
+PersonEntity ───1:1─── UserAccountEntity
     │
-    └──1:1─── UserAccountEntity
+    ├──1:1─── StudentEntity
+    │              │
+    │              ├──1:N─── EnrollmentEntity ───1:N─── CourseSectionEntity
+    │              │                                        │
+    │              │                              ProfessorAssignmentEntity
+    │              │                                        ↑
+    │              │                                  ProfessorEntity
+    │              │
+    │              └──1:N─── ExamGradeEntity ───N:1─── SubjectEntity
+    │
+    └──1:1─── ProfessorEntity
+                   │
+                   └──1:N─── ProfessorAssignmentEntity
 
-DegreeEntity ───1:N─── SubjectEntity
-                          │
-PrerequisiteEntity ──────┘
-
-SubjectEntity ───1:N─── CourseSectionEntity ───1:N─── ScheduleEntity
-                              │
-                              ├──1:N─── ClassSessionEntity ───1:N─── AttendanceEntity
-                              │
-                              ├──1:N─── ProfessorAssignmentEntity
-                              │               ↑
-                              │     ProfessorEntity
-                              │
-                              └──1:N─── EnrollmentEntity ───1:N─── ExamGradeEntity
-                                            ↑
-                                      StudentEntity
+SubjectEntity ───1:N─── PrerequisiteEntity (materia)
+SubjectEntity ───1:N─── PrerequisiteEntity (materia_correlativa)
+SubjectEntity ───1:N─── CourseSectionEntity
 ```
 
 ---
@@ -162,19 +152,19 @@ SubjectEntity ───1:N─── CourseSectionEntity ───1:N─── Sc
 | PUT | `/api/persons/{id}` | ADMIN |
 | DELETE | `/api/persons/{id}` | ADMIN |
 
-### Estudiantes
+### Alumnos
 | Método | Endpoint | Roles |
 |---|---|---|
 | GET | `/api/students` | ADMIN, STAFF |
-| GET | `/api/students/{id}` | ADMIN, STUDENT |
+| GET | `/api/students/{id}` | ADMIN, ALUMNO |
 | PUT | `/api/students/{id}` | ADMIN |
-| GET | `/api/students/{id}/academic-history` | ADMIN, STUDENT |
+| GET | `/api/students/{id}/academic-history` | ADMIN, ALUMNO |
 
-### Profesores
+### Docentes
 | Método | Endpoint | Roles |
 |---|---|---|
 | GET | `/api/professors` | ADMIN, STAFF |
-| GET | `/api/professors/{id}` | ADMIN, PROFESSOR |
+| GET | `/api/professors/{id}` | ADMIN, DOCENTE |
 | POST | `/api/professors/{id}/assignments` | ADMIN |
 
 ### Materias
@@ -199,30 +189,23 @@ SubjectEntity ───1:N─── CourseSectionEntity ───1:N─── Sc
 | Método | Endpoint | Roles |
 |---|---|---|
 | GET | `/api/enrollments` | ADMIN, STAFF |
-| POST | `/api/enrollments` | STUDENT, ADMIN |
-| GET | `/api/enrollments/student/{studentId}` | STUDENT, ADMIN |
-| DELETE | `/api/enrollments/{id}` | STUDENT, ADMIN |
-
-### Asistencias
-| Método | Endpoint | Roles |
-|---|---|---|
-| GET | `/api/attendances/session/{sessionId}` | PROFESSOR, ADMIN |
-| POST | `/api/attendances` | PROFESSOR, ADMIN |
-| GET | `/api/attendances/student/{studentId}` | STUDENT, ADMIN |
+| POST | `/api/enrollments` | ALUMNO, ADMIN |
+| GET | `/api/enrollments/student/{studentId}` | ALUMNO, ADMIN |
+| DELETE | `/api/enrollments/{id}` | ALUMNO, ADMIN |
 
 ### Exámenes y Notas
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/grades/student/{studentId}` | STUDENT, ADMIN |
-| POST | `/api/grades` | PROFESSOR, ADMIN |
-| PUT | `/api/grades/{id}` | PROFESSOR, ADMIN |
+| GET | `/api/grades/student/{studentId}` | ALUMNO, ADMIN |
+| POST | `/api/grades` | DOCENTE, ADMIN |
+| PUT | `/api/grades/{id}` | DOCENTE, ADMIN |
 
 ---
 
 ## Seguridad
 
 - **JWT (JSON Web Token)**: generado en login con expiración de 24 horas
-- **Roles**: ADMIN, STUDENT, PROFESSOR, STAFF
+- **Roles**: ALUMNO, DOCENTE, ADMINISTRATIVO, SYSADMIN
 - **Protección de endpoints**: mediante `@PreAuthorize` en los controladores
 - **Contraseñas**: encriptadas con BCrypt (Spring Security)
 - **CORS**: configurable para permitir peticiones del frontend en desarrollo
@@ -233,7 +216,7 @@ SubjectEntity ───1:N─── CourseSectionEntity ───1:N─── Sc
 |---|---|
 | Públicos | `POST /api/auth/register`, `POST /api/auth/login` |
 | Requieren JWT | `GET /api/students`, `POST /api/enrollments`, etc. |
-| Requieren rol específico | `POST /api/subjects` (solo ADMIN), `POST /api/grades` (PROFESSOR o ADMIN) |
+| Requieren rol específico | `POST /api/subjects` (solo ADMIN), `POST /api/grades` (DOCENTE o ADMIN) |
 
 ---
 
@@ -244,6 +227,7 @@ University-Management/
 ├── pom.xml
 ├── README.md
 ├── Requisitos.md
+├── sysacad_modelo_v2.html
 ├── .gitignore
 ├── src/
 │   ├── main/
@@ -253,92 +237,78 @@ University-Management/
 │   │   │   │   ├── AuthController.java
 │   │   │   │   └── UserController.java
 │   │   │   ├── service/
+│   │   │   │   ├── PersonService.java
+│   │   │   │   ├── UserAccountService.java
 │   │   │   │   ├── StudentService.java
 │   │   │   │   ├── ProfessorService.java
 │   │   │   │   ├── SubjectService.java
-│   │   │   │   ├── CourseSectionService.java
-│   │   │   │   ├── EnrollmentService.java
-│   │   │   │   ├── AttendanceService.java
-│   │   │   │   ├── ExamGradeService.java
-│   │   │   │   ├── ScheduleService.java
-│   │   │   │   ├── ClassSessionService.java
-│   │   │   │   ├── DegreeService.java
 │   │   │   │   ├── PrerequisiteService.java
+│   │   │   │   ├── CourseSectionService.java
 │   │   │   │   ├── ProfessorAssignmentService.java
-│   │   │   │   ├── PersonService.java
-│   │   │   │   ├── AdministrativeStaffService.java
-│   │   │   │   └── UserAccountService.java
+│   │   │   │   ├── EnrollmentService.java
+│   │   │   │   └── ExamGradeService.java
 │   │   │   ├── repository/
+│   │   │   │   ├── PersonRepository.java
+│   │   │   │   ├── UserAccountRepository.java
 │   │   │   │   ├── StudentRepository.java
 │   │   │   │   ├── ProfessorRepository.java
 │   │   │   │   ├── SubjectRepository.java
-│   │   │   │   ├── CourseSectionRepository.java
-│   │   │   │   ├── EnrollmentRepository.java
-│   │   │   │   ├── AttendanceRepository.java
-│   │   │   │   ├── ExamGradeRepository.java
-│   │   │   │   ├── ScheduleRepository.java
-│   │   │   │   ├── ClassSessionRepository.java
-│   │   │   │   ├── DegreeRepository.java
 │   │   │   │   ├── PrerequisiteRepository.java
+│   │   │   │   ├── CourseSectionRepository.java
 │   │   │   │   ├── ProfessorAssignmentRepository.java
-│   │   │   │   ├── PersonRepository.java
-│   │   │   │   ├── AdministrativeStaffRepository.java
-│   │   │   │   └── UserAccountRepository.java
+│   │   │   │   ├── EnrollmentRepository.java
+│   │   │   │   └── ExamGradeRepository.java
 │   │   │   ├── model/
 │   │   │   │   ├── PersonEntity.java
+│   │   │   │   ├── UserAccountEntity.java
 │   │   │   │   ├── StudentEntity.java
 │   │   │   │   ├── ProfessorEntity.java
-│   │   │   │   ├── AdministrativeStaffEntity.java
-│   │   │   │   ├── UserAccountEntity.java
-│   │   │   │   ├── DegreeEntity.java
 │   │   │   │   ├── SubjectEntity.java
 │   │   │   │   ├── PrerequisiteEntity.java
 │   │   │   │   ├── CourseSectionEntity.java
-│   │   │   │   ├── ScheduleEntity.java
-│   │   │   │   ├── ClassSessionEntity.java
 │   │   │   │   ├── ProfessorAssignmentEntity.java
 │   │   │   │   ├── EnrollmentEntity.java
-│   │   │   │   ├── AttendanceEntity.java
 │   │   │   │   └── ExamGradeEntity.java
 │   │   │   ├── enums/
-│   │   │   │   ├── AcademicCondition.java
 │   │   │   │   ├── AccountStatus.java
-│   │   │   │   ├── DayOfWeek.java
-│   │   │   │   ├── DedicationType.java
 │   │   │   │   ├── EnrollmentStatus.java
 │   │   │   │   ├── ExamType.java
-│   │   │   │   ├── Gender.java
 │   │   │   │   ├── ProfessorCategory.java
 │   │   │   │   ├── RequirementType.java
 │   │   │   │   ├── SectionRole.java
 │   │   │   │   ├── SectionStatus.java
 │   │   │   │   ├── Shift.java
 │   │   │   │   ├── StudentStatus.java
-│   │   │   │   ├── SystemRol.java
-│   │   │   │   └── TermType.java
+│   │   │   │   └── SystemRol.java
 │   │   │   ├── dto/
 │   │   │   │   ├── request/
+│   │   │   │   │   ├── AssignProfessorDTO.java
 │   │   │   │   │   ├── CreatePersonDTO.java
+│   │   │   │   │   ├── CreateSubjectDTO.java
 │   │   │   │   │   ├── EnrollmentRequestDTO.java
 │   │   │   │   │   ├── LoginRequestDTO.java
 │   │   │   │   │   ├── OpenSectionDTO.java
+│   │   │   │   │   ├── RegisterRequestDTO.java
 │   │   │   │   │   └── SubmitGradeDTO.java
 │   │   │   │   └── response/
 │   │   │   │       ├── AcademicHistoryDTO.java
+│   │   │   │       ├── EnrollmentResponseDTO.java
+│   │   │   │       ├── GradeResponseDTO.java
 │   │   │   │       ├── OpenSectionResponseDTO.java
 │   │   │   │       ├── PersonResponseDTO.java
+│   │   │   │       ├── ProfessorResponseDTO.java
 │   │   │   │       ├── StudentProfileDTO.java
 │   │   │   │       ├── SubjectDetailDTO.java
 │   │   │   │       └── TokenResponseDTO.java
 │   │   │   ├── mapper/
+│   │   │   │   ├── EnrollmentMapper.java
 │   │   │   │   ├── StudentMapper.java
-│   │   │   │   ├── SubjectMapper.java
-│   │   │   │   └── EnrollmentMapper.java
+│   │   │   │   └── SubjectMapper.java
 │   │   │   └── exception/
-│   │   │       ├── GlobalExceptionHandler.java
-│   │   │       ├── ResourceNotFoundException.java
 │   │   │       ├── BusinessException.java
-│   │   │       └── DuplicateEntityException.java
+│   │   │       ├── DuplicateEntityException.java
+│   │   │       ├── GlobalExceptionHandler.java
+│   │   │       └── ResourceNotFoundException.java
 │   │   └── resources/
 │   │       └── application.properties
 │   └── test/

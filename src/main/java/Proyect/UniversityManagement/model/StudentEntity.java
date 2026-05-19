@@ -30,9 +30,6 @@ public class StudentEntity {
     @Column(name = "fecha_ingreso")
     private LocalDate fechaIngreso;
 
-    @Column(name = "fecha_egreso")
-    private LocalDate fechaEgreso;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_alumno", nullable = false)
     private StudentStatus estadoAlumno;
@@ -42,7 +39,4 @@ public class StudentEntity {
 
     @OneToMany(mappedBy = "alumno")
     private List<ExamGradeEntity> notasExamen = new ArrayList<>();
-
-    @OneToMany(mappedBy = "alumno")
-    private List<AttendanceEntity> asistencias = new ArrayList<>();
 }

@@ -1,10 +1,7 @@
 package Proyect.UniversityManagement.model;
 
-import Proyect.UniversityManagement.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "persona")
@@ -27,20 +24,10 @@ public class PersonEntity {
     @Column(nullable = false)
     private String apellido;
 
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
-
     @Column(name = "email_personal", unique = true)
     private String emailPersonal;
 
     private String telefono;
-
-    private String domicilio;
-
-    @Enumerated(EnumType.STRING)
-    private Gender sexo;
-
-    private String nacionalidad;
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
     private UserAccountEntity cuentaUsuario;
@@ -50,7 +37,4 @@ public class PersonEntity {
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
     private ProfessorEntity docente;
-
-    @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
-    private AdministrativeStaffEntity administrativo;
 }

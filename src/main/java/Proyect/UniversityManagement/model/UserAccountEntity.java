@@ -5,8 +5,6 @@ import Proyect.UniversityManagement.enums.SystemRol;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "cuenta_usuario")
 @Getter
@@ -24,7 +22,7 @@ public class UserAccountEntity {
     private PersonEntity persona;
 
     @Column(unique = true, nullable = false)
-    private String identificador;
+    private String emailLogin;
 
     @Column(nullable = false)
     private String password;
@@ -36,7 +34,4 @@ public class UserAccountEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccountStatus estado;
-
-    @Column(name = "fecha_alta")
-    private LocalDateTime fechaAlta;
 }

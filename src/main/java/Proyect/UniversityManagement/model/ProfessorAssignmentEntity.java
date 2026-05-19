@@ -32,7 +32,4 @@ public class ProfessorAssignmentEntity {
 
     @Column(name = "fecha_asignacion")
     private LocalDate fechaAsignacion;
-
-    @Column(name = "fecha_baja")
-    private LocalDate fechaBaja;
 }

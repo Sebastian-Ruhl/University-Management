@@ -37,17 +37,6 @@ public class ExamGradeEntity {
     @Column(name = "valor_numerico")
     private Double valorNumerico;
 
-    @Column(name = "valor_texto")
-    private String valorTexto;
-
     @Column(name = "fecha_examen")
     private LocalDate fechaExamen;
-
-    private String tomo;
-
-    private String folio;
-
-    private String libro;
-
-    private String observaciones;
 }

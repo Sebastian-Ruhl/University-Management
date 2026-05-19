@@ -27,7 +27,4 @@ public class PrerequisiteEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_requisito", nullable = false)
     private RequirementType tipoRequisito;
-
-    @Column(nullable = false)
-    private Boolean activa;
 }

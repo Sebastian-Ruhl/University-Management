@@ -1,6 +1,5 @@
 package Proyect.UniversityManagement.model;
 
-import Proyect.UniversityManagement.enums.TermType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,11 +18,7 @@ public class SubjectEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_carrera", nullable = false)
-    private DegreeEntity carrera;
-
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String codigo;
 
     @Column(nullable = false)
@@ -37,13 +32,6 @@ public class SubjectEntity {
 
     @Column(name = "carga_horaria_semanal")
     private Integer cargaHorariaSemanal;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_dictado", nullable = false)
-    private TermType tipoDictado;
-
-    @Column(nullable = false)
-    private Boolean optativa;
 
     @OneToMany(mappedBy = "materia")
     private List<CourseSectionEntity> comisiones = new ArrayList<>();

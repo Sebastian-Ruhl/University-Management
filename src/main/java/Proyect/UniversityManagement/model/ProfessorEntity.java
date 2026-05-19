@@ -1,11 +1,9 @@
 package Proyect.UniversityManagement.model;
 
-import Proyect.UniversityManagement.enums.DedicationType;
 import Proyect.UniversityManagement.enums.ProfessorCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +29,6 @@ public class ProfessorEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProfessorCategory categoria;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DedicationType dedicacion;
-
-    @Column(name = "fecha_alta_docente")
-    private LocalDate fechaAltaDocente;
 
     @Column(nullable = false)
     private Boolean activo;
