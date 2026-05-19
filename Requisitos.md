@@ -1,147 +1,115 @@
-# Requisitos Funcionales — SAAS-Restaurant-Management
+# Requisitos Funcionales — University Management (SYSACAD)
+
+Este documento detalla los Requisitos Funcionales (RF) de la plataforma de Gestión Académica Universitaria (**SYSACAD**). El sistema está diseñado bajo una arquitectura de API RESTful con control de acceso basado en roles para Alumnos, Docentes, Administrativos y Administradores de Sistema.
 
 ---
 
-## Módulo de Autenticación y Usuarios
+## 🔐 Módulo de Autenticación y Cuentas de Usuario
 
-**RF01** — El sistema debe permitir el registro de un nuevo restaurante con sus datos básicos.
+**RF01** — El sistema debe permitir el registro de nuevos usuarios en la plataforma.
 
-**RF02** — El sistema debe permitir iniciar sesión con email y contraseña.
+**RF02** — El sistema debe permitir a los usuarios iniciar sesión utilizando sus credenciales (`emailLogin` y contraseña).
 
-**RF03** — El sistema debe permitir al administrador crear empleados con un rol específico.
+**RF03** — El sistema debe generar y retornar un token de acceso seguro (JWT) válido tras un inicio de sesión exitoso.
 
-**RF04** — El sistema debe poder realizar un ABM de empleados del restaurante.
+**RF04** — El sistema debe restringir el acceso a los recursos y endpoints basándose en los roles del sistema: `ALUMNO`, `DOCENTE`, `ADMINISTRATIVO`, `SYSADMIN`.
 
-**RF05** — El sistema debe validar que no se supere el límite de usuarios según el plan contratado.
-
-**RF06** — El sistema debe permitir filtrar empleados por rol.
+**RF05** — El sistema debe gestionar el ciclo de vida y estado de las cuentas de usuario (`ACTIVA`, `BLOQUEADA`, `INACTIVA`).
 
 ---
 
-## Módulo de Planes y Suscripciones
+## 👤 Módulo de Personas (Gestión de Identidades)
 
-**RF07** — El sistema debe mostrar los planes de suscripción disponibles sin necesidad de autenticación.
+**RF06** — El sistema debe permitir al administrador realizar el ABM (Alta, Baja, Modificación) de personas físicas.
 
-**RF08** — El sistema debe permitir al administrador contratar o cambiar de plan.
+**RF07** — El sistema debe garantizar que el DNI y el correo electrónico personal de una persona sean únicos en todo el sistema.
 
-**RF09** — El sistema debe gestionar el ciclo de vida de una suscripción (pendiente, activa, vencida o cancelada).
+**RF08** — El sistema debe permitir listar el total de personas físicas registradas para fines de administración.
 
-**RF10** — El sistema debe poder registrar pagos de suscripciones.
-
-**RF11** — El sistema debe procesar las notificaciones enviadas por Mercado Pago.
-
-**RF12** — El sistema debe desactivar automáticamente las suscripciones vencidas.
-
-**RF13** — El sistema debe permitir al administrador ver el historial de suscripciones de su restaurante.
-
-**RF14** — El sistema debe permitir filtrar suscripciones por estado.
-
-**RF15** — El sistema debe permitir al administrador ver el historial de pagos de su restaurante.
-
-**RF16** — El sistema debe permitir filtrar pagos por estado y rango de fechas.
+**RF09** — El sistema debe permitir la consulta detallada de los datos personales de una persona por medio de su ID único.
 
 ---
 
-## Módulo de Restaurants
+## 🎓 Módulo de Alumnos (Gestión Académica)
 
-**RF17** — El sistema debe permitir al administrador editar los datos de su restaurante.
+**RF10** — El sistema debe permitir la asignación de un perfil de alumno (`StudentEntity`) a una persona física previamente registrada.
 
-**RF18** — El sistema debe aislar los datos de cada restaurante para que no se mezclen entre sí.
+**RF11** — El sistema debe generar y asignar un número de Legajo único e inmutable para cada alumno al momento de crear su perfil.
 
----
+**RF12** — El sistema debe registrar la fecha de ingreso a la universidad para cada alumno.
 
-## Módulo de Menú
+**RF13** — El sistema debe permitir gestionar y actualizar el estado académico del alumno (`ACTIVO`, `EGRESADO`, `BAJA_TEMPORARIA`, `BAJA_DEFINITIVA`).
 
-**RF19** — El sistema debe permitir al administrador crear, editar y eliminar categorías del menú.
-
-**RF20** — El sistema debe permitir al administrador crear, editar y eliminar productos del menú.
-
-**RF21** — El sistema debe permitir al administrador cambiar la disponibilidad de un producto.
-
-**RF22** — El sistema debe listar los productos filtrados por categoría.
-
-**RF23** — El sistema debe permitir buscar productos por nombre.
-
-**RF24** — El sistema debe permitir filtrar productos por rango de precio.
-
-**RF25** — El sistema debe permitir listar solo los productos disponibles.
+**RF14** — El sistema debe permitir al alumno y a los administradores consultar el historial académico (materias cursadas, calificaciones y promedio general).
 
 ---
 
-## Módulo de Mesas
+## 👨‍🏫 Módulo de Docentes (Gestión de Profesores)
 
-**RF26** — El sistema debe permitir al administrador crear, editar y eliminar mesas.
+**RF15** — El sistema debe permitir la asignación de un perfil de docente (`ProfessorEntity`) a una persona física previamente registrada.
 
-**RF27** — El sistema debe permitir cambiar el estado de una mesa.
+**RF16** — El sistema debe generar y asignar un número de docente único para cada profesor.
 
-**RF28** — El sistema debe validar que no se supere el límite de mesas según el plan contratado.
+**RF17** — El sistema debe permitir categorizar al docente según su escalafón universitario (`AYUDANTE_ALUMNO`, `AYUDANTE_DIPLOMADO`, `JTP`, `ADJUNTO`, `ASOCIADO`, `TITULAR`).
 
-**RF29** — El sistema debe listar las mesas disponibles según capacidad y horario.
-
-**RF30** — El sistema debe permitir filtrar mesas por ubicación.
-
-**RF31** — El sistema debe permitir filtrar mesas por estado.
+**RF18** — El sistema debe permitir cambiar el estado de actividad de un docente (activo/inactivo) dentro de la institución.
 
 ---
 
-## Módulo de Pedidos
+## 📚 Módulo de Materias y Correlatividades
 
-**RF32** — El sistema debe permitir al mozo crear un pedido asociado a una mesa.
+**RF19** — El sistema debe permitir al administrador realizar el ABM (Alta, Baja, Modificación) de materias curriculares.
 
-**RF33** — El sistema debe permitir agregar y quitar productos de un pedido.
+**RF20** — El sistema debe almacenar para cada materia su código único, nombre descriptivo, año correspondiente de la carrera, cuatrimestre de dictado y la carga horaria semanal.
 
-**RF34** — El sistema debe calcular el total del pedido automáticamente.
+**RF21** — El sistema debe permitir al administrador definir reglas de correlatividades (prerrequisitos) entre materias curriculares.
 
-**RF35** — El sistema debe permitir cambiar el estado del pedido a lo largo de su preparación y servicio.
+**RF22** — El sistema debe soportar dos tipos de requisitos para las correlativas: que la materia previa deba estar **APROBADA** o simplemente **REGULARIZADA**.
 
-**RF36** — El sistema debe listar los pedidos activos del restaurante.
-
-**RF37** — El sistema debe listar los pedidos realizados por un mozo en particular.
-
-**RF38** — El sistema debe permitir filtrar pedidos por rango de fechas.
-
-**RF39** — El sistema debe permitir filtrar pedidos por estado.
-
-**RF40** — El sistema debe permitir listar los pedidos de una mesa específica.
-
-**RF41** — El sistema debe permitir buscar un pedido por su número o ID.
+**RF23** — El sistema debe permitir listar todas las materias y buscar una materia por su identificador.
 
 ---
 
-## Módulo de Reservas
+## 🏫 Módulo de Comisiones (Oferta Académica)
 
-**RF42** — El sistema debe permitir a un cliente crear una reserva sin necesidad de registrarse.
+**RF24** — El sistema debe permitir al administrador realizar la apertura de comisiones para el dictado de materias en un año lectivo y cuatrimestre determinados.
 
-**RF43** — El sistema debe permitir al administrador confirmar, cancelar o marcar como cumplida una reserva.
+**RF25** — El sistema debe registrar para cada comisión su nombre distintivo, turno asignado (`MAÑANA`, `TARDE`, `NOCHE`) y cupo máximo de alumnos permitidos.
 
-**RF44** — El sistema debe consultar la disponibilidad de mesas para una fecha y horario determinados.
+**RF26** — El sistema debe gestionar el estado del ciclo de vida de cada comisión (`PLANIFICADA`, `ABIERTA_INSCRIPCION`, `EN_CURSO`, `CERRADA`).
 
-**RF45** — El sistema debe asignar una o varias mesas a una misma reserva.
+**RF27** — El sistema debe permitir la asignación de uno o más docentes al dictado de una comisión.
 
-**RF46** — El sistema debe permitir filtrar reservas por fecha.
-
-**RF47** — El sistema debe permitir filtrar reservas por estado.
-
-**RF48** — El sistema debe permitir buscar reservas por nombre del cliente.
+**RF28** — El sistema debe registrar el rol del docente en dicha comisión (`TITULAR`, `AYUDANTE_PRIMERA`, `AYUDANTE_SEGUNDA`, `JTP`) junto con la fecha en que se realizó la asignación.
 
 ---
 
-## Módulo de Reportes
+## 📝 Módulo de Inscripciones (Cursadas)
 
-**RF49** — El sistema debe generar un reporte de ventas diarias.
+**RF29** — El sistema debe permitir a los alumnos inscribirse a comisiones habilitadas y abiertas para la inscripción (`ABIERTA_INSCRIPCION`).
 
-**RF50** — El sistema debe generar un reporte de ventas semanales.
+**RF30** — El sistema debe validar que el alumno cumpla de manera estricta con todas las correlativas requeridas (aprobadas o regularizadas) antes de confirmar una inscripción.
 
-**RF51** — El sistema debe generar un reporte de ventas mensuales.
+**RF31** — El sistema debe validar que la comisión disponga de cupo libre antes de autorizar la inscripción del alumno.
 
-**RF52** — El sistema debe listar los productos más vendidos en un período.
+**RF32** — El sistema debe registrar la fecha y hora exacta en la que se efectúa la inscripción del alumno.
 
-**RF53** — El sistema debe listar las mesas más ocupadas en un período.
+**RF33** — El sistema debe inicializar de forma automática el estado de la cursada del alumno como `CURSANDO` al inscribirse.
 
-**RF54** — El sistema debe generar un reporte de reservas en un período.
+**RF34** — El sistema debe permitir al alumno o al administrador dar de baja (desinscribirse) una cursada activa.
 
-**RF55** — El sistema debe generar un reporte de ingresos por método de pago.
+**RF35** — El sistema debe permitir al administrador cambiar el estado de la cursada a `REGULAR`, `LIBRE`, `APROBADA`, `DESAPROBADA` o `ABANDONO`, y registrar la nota final de cursada si correspondiera.
 
-**RF56** — El sistema debe listar los empleados con más pedidos atendidos en un período.
+---
 
+## 🏆 Módulo de Exámenes y Notas (Calificaciones)
 
+**RF36** — El sistema debe permitir a los docentes o administradores registrar las calificaciones de las evaluaciones rendidas por los alumnos en una materia.
+
+**RF37** — El sistema debe registrar para cada calificación: el alumno evaluado, la materia, el docente titular que firma el acta, la fecha del examen, el tipo de evaluación y la nota numérica obtenida.
+
+**RF38** — El sistema debe admitir diversos tipos de calificaciones/exámenes: `PARCIAL_1`, `PARCIAL_2`, `RECUPERATORIO_1`, `RECUPERATORIO_2`, `FLOTANTE`, `FINAL`, `EQUIVALENCIA` o `NIVELATORIO`.
+
+**RF39** — El sistema debe permitir a los alumnos consultar de forma privada todas sus calificaciones registradas a lo largo de su carrera.
+
+**RF40** — El sistema debe permitir a los docentes o administradores editar y actualizar las calificaciones registradas en caso de error administrativo.

@@ -313,7 +313,7 @@ University-Management/
 │   │       └── application.properties
 │   └── test/
 │       └── java/Proyect/UniversityManagement/
-│           └── RestaurantManagementApplicationTests.java
+│           └── UniversityManagementApplicationTests.java
 └── target/
 ```
 
