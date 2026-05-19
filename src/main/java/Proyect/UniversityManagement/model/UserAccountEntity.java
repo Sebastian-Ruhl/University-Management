@@ -1,7 +1,42 @@
 package Proyect.UniversityManagement.model;
 
-import jakarta.persistence.Entity;
+import Proyect.UniversityManagement.enums.AccountStatus;
+import Proyect.UniversityManagement.enums.SystemRol;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "cuenta_usuario")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserAccountEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "id_persona", unique = true, nullable = false)
+    private PersonEntity persona;
+
+    @Column(unique = true, nullable = false)
+    private String identificador;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol_sistema", nullable = false)
+    private SystemRol rolSistema;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountStatus estado;
+
+    @Column(name = "fecha_alta")
+    private LocalDateTime fechaAlta;
 }

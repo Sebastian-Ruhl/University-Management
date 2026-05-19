@@ -1,6 +1,6 @@
-# SAAS-Restaurant-Management
+# University Management — SYSACAD
 
-Sistema SaaS multi-tenant para la gestión integral de restaurantes. API RESTful desarrollada con **Spring Boot** como Trabajo Práctico Final de **Programación III** (Comisión 4, UTN).
+Sistema de Gestión Académica universitaria. API RESTful desarrollada con **Spring Boot** como Trabajo Práctico Final de **Programación III** (Comisión 4, UTN).
 
 ---
 
@@ -10,10 +10,8 @@ Sistema SaaS multi-tenant para la gestión integral de restaurantes. API RESTful
 - [Arquitectura](#arquitectura)
 - [Stack Tecnológico](#stack-tecnológico)
 - [Modelo de Datos](#modelo-de-datos)
-- [Planes de Suscripción](#planes-de-suscripción)
 - [Endpoints de la API](#endpoints-de-la-api)
 - [Seguridad](#seguridad)
-- [Integración con Mercado Pago](#integración-con-mercado-pago)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Cómo Ejecutar el Proyecto](#cómo-ejecutar-el-proyecto)
 - [Integrantes](#integrantes)
@@ -22,17 +20,17 @@ Sistema SaaS multi-tenant para la gestión integral de restaurantes. API RESTful
 
 ## Descripción del Proyecto
 
-Sistema SaaS que permite a múltiples restaurantes registrarse y gestionar sus operaciones diarias a través de una API RESTful. Cada restaurante opera sus datos de forma aislada (multi-tenant) y accede a funcionalidades según el plan de suscripción que contrate.
+Sistema que permite gestionar integralmente las operaciones académicas de una universidad a través de una API RESTful. Administra estudiantes, profesores, materias, comisiones, inscripciones, asistencias, exámenes y horarios.
 
 ### Funcionalidades principales
 
-- **Gestión de usuarios y roles**: administrador, mozo, cocinero y cajero, cada uno con permisos específicos.
-- **Gestión del menú**: categorías y productos con control de disponibilidad.
-- **Gestión de mesas**: control de estado y límites según el plan contratado.
-- **Gestión de pedidos**: creación, cambio de estados (abierto, en preparación, listo, entregado, pagado) y cálculo automático del total.
-- **Gestión de reservas**: clientes pueden reservar mesas sin registrarse.
-- **Suscripciones y pagos**: planes con diferentes límites y features, integración con Mercado Pago.
-- **Reportes**: ventas diarias, semanales, mensuales, productos más vendidos y más.
+- **Gestión de personas**: estudiantes, profesores y personal administrativo con datos personales y académicos.
+- **Gestión de carreras y materias**: ABM de planes de estudio, correlatividades y requisitos.
+- **Gestión de comisiones**: apertura de cursadas por cuatrimestre, asignación de profesores y horarios.
+- **Gestión de inscripciones**: inscripción de estudiantes a comisiones con validación de correlatividades.
+- **Gestión de asistencias**: registro de asistencia por clase, control de condición académica.
+- **Gestión de exámenes y notas**: carga de notas de parciales, finales y recuperatorios.
+- **Autenticación y roles**: acceso segmentado por rol (ADMIN, STUDENT, PROFESSOR, STAFF).
 
 ---
 
@@ -68,7 +66,7 @@ Cliente (Postman / Frontend / Swagger UI)
 - DTOs de entrada y salida — nunca se exponen entidades JPA directamente
 - Manejo centralizado de excepciones con `@RestControllerAdvice`
 - Validaciones con `@Valid` aplicadas sobre los DTOs de entrada
-- Documentación completa via Swagger / OpenAPI
+- Documentación via Swagger / OpenAPI
 
 ---
 
@@ -76,79 +74,74 @@ Cliente (Postman / Frontend / Swagger UI)
 
 | Tecnología | Versión | Uso |
 |---|---|---|
-| Java | 17+ | Lenguaje de programación |
-| Spring Boot | 3.x | Framework principal |
-| Spring Web | — | Controladores REST (`@RestController`) |
+| Java | 26 | Lenguaje de programación |
+| Spring Boot | 4.0.6 | Framework principal |
+| Spring Web MVC | — | Controladores REST (`@RestController`) |
 | Spring Data JPA | — | Persistencia y mapeo ORM |
 | Spring Security | — | Autenticación y autorización |
 | MySQL | 8.x | Base de datos relacional |
-| JWT (jjwt) | 0.12.x | Tokens de autenticación |
-| Swagger / OpenAPI | springdoc-openapi 2.x | Documentación interactiva |
-| Mercado Pago SDK | SDK Java | Procesamiento de pagos |
+| JWT (jjwt) | — | Tokens de autenticación |
+| Swagger / OpenAPI | springdoc-openapi | Documentación interactiva |
 | Maven | — | Gestión de dependencias y build |
-| JUnit 5 | — | Pruebas unitarias (diferenciador) |
+| Lombok | — | Reducción de boilerplate |
+| JUnit 5 | — | Pruebas unitarias |
 
 ---
 
 ## Modelo de Datos
 
-El sistema cuenta con **13 entidades** distribuidas en 6 módulos:
+El sistema cuenta con **15 entidades** distribuidas en 5 módulos:
 
-### Módulo de Suscripciones y Pagos
-- **Plan** — Catálogo de planes con precio, límites y features
-- **Suscripcion** — Vincula un restaurante con un plan (estados: pendiente, activa, vencida, cancelada)
-- **Pago** — Registro de pagos con integración Mercado Pago
-- **NotificacionWebhook** — Registro de webhooks entrantes de MP
+### Módulo de Personas
+- **PersonEntity** — Entidad base con datos personales (nombre, documento, contacto)
+- **StudentEntity** — Datos específicos del alumno (legajo, estado, condición académica)
+- **ProfessorEntity** — Datos específicos del profesor (categoría, dedicación)
+- **AdministrativeStaffEntity** — Datos del personal administrativo
+- **UserAccountEntity** — Credenciales de acceso (email, contraseña, rol)
 
-### Módulo de Restaurants
-- **Restaurant** — Entidad raíz multi-tenant con datos del negocio
+### Módulo Académico
+- **DegreeEntity** — Carreras universitarias
+- **SubjectEntity** — Materias dentro de una carrera
+- **PrerequisiteEntity** — Correlatividades entre materias
 
-### Módulo de Usuarios
-- **Usuario** — Empleados con rol (ADMIN, MOZO, COCINERO, CAJERO)
+### Módulo de Cursada
+- **CourseSectionEntity** — Comisiones abiertas en un cuatrimestre
+- **ScheduleEntity** — Horarios semanales de una comisión
+- **ClassSessionEntity** — Clases individuales dictadas
+- **ProfessorAssignmentEntity** — Asignación de profesores a comisiones
 
-### Módulo de Menú
-- **Categoria** — Agrupación de productos (entradas, platos principales, etc.)
-- **Producto** — Items del menú con precio y disponibilidad
-
-### Módulo de Operaciones
-- **Mesa** — Mesas con número, capacidad, ubicación y estado
-- **Pedido** — Pedidos con estados y total automático
-- **DetallePedido** — Items individuales dentro de un pedido
-
-### Módulo de Reservas
-- **Reserva** — Reservas de clientes con datos de contacto
-- **ReservaMesa** — Tabla intermedia N:M entre reservas y mesas
+### Módulo de Alumnos
+- **EnrollmentEntity** — Inscripción de un alumno a una comisión
+- **AttendanceEntity** — Asistencia a clases
+- **ExamGradeEntity** — Notas de exámenes
 
 ### Diagrama de relaciones
 
 ```
-Plan ───1:N─── Suscripcion ───1:N─── Pago ───1:N─── NotificacionWebhook
-                    ↑
-Restaurant ───1:N──┘
+PersonEntity ───1:1─── StudentEntity
+    │                    │
+    ├──1:1─── ProfessorEntity
+    │                    │
+    ├──1:1─── AdministrativeStaffEntity
     │
-    ├──1:N─── Usuario
-    ├──1:N─── Categoria ───1:N─── Producto
-    ├──1:N─── Mesa ──────────N:M────── Reserva
-    │                              │
-    ├──1:N─── Pedido              ReservaMesa
-    │          │
-    │          ├──1:N─── DetallePedido ───N:1─── Producto
-    │
-    └──1:N─── Reserva
+    └──1:1─── UserAccountEntity
+
+DegreeEntity ───1:N─── SubjectEntity
+                          │
+PrerequisiteEntity ──────┘
+
+SubjectEntity ───1:N─── CourseSectionEntity ───1:N─── ScheduleEntity
+                              │
+                              ├──1:N─── ClassSessionEntity ───1:N─── AttendanceEntity
+                              │
+                              ├──1:N─── ProfessorAssignmentEntity
+                              │               ↑
+                              │     ProfessorEntity
+                              │
+                              └──1:N─── EnrollmentEntity ───1:N─── ExamGradeEntity
+                                            ↑
+                                      StudentEntity
 ```
-
----
-
-## Planes de Suscripción
-
-| Plan | Precio | Mesas | Usuarios | Funcionalidades |
-|---|---|---|---|---|
-| GRATIS | $0/mes | Hasta 5 | 2 | Menú, mesas, pedidos básicos |
-| BASICO | $10/mes | Hasta 15 | 5 | + Reservas, reportes básicos |
-| PREMIUM | $25/mes | Hasta 50 | 15 | + Reportes avanzados, todos los roles |
-| ENTERPRISE | $50/mes | Ilimitado | Ilimitado | + Multi-sucursal |
-
-Los límites se validan en la capa de servicio al crear/editar mesas y usuarios.
 
 ---
 
@@ -157,113 +150,79 @@ Los límites se validan en la capa de servicio al crear/editar mesas y usuarios.
 ### Auth (público)
 | Método | Endpoint | Descripción |
 |---|---|---|
-| POST | `/api/auth/register` | Registrar nuevo restaurante |
+| POST | `/api/auth/register` | Registrar nuevo usuario |
 | POST | `/api/auth/login` | Iniciar sesión (devuelve JWT) |
 
-### Planes
+### Personas
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/planes` | Público |
-| GET | `/api/planes/{id}` | Público |
-| POST | `/api/planes` | ADMIN |
-| PUT | `/api/planes/{id}` | ADMIN |
-| DELETE | `/api/planes/{id}` | ADMIN |
+| GET | `/api/persons` | ADMIN, STAFF |
+| GET | `/api/persons/{id}` | ADMIN, STAFF |
+| POST | `/api/persons` | ADMIN |
+| PUT | `/api/persons/{id}` | ADMIN |
+| DELETE | `/api/persons/{id}` | ADMIN |
 
-### Suscripciones
+### Estudiantes
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/suscripciones` | ADMIN |
-| POST | `/api/suscripciones` | ADMIN |
-| GET | `/api/suscripciones/actual` | ADMIN |
+| GET | `/api/students` | ADMIN, STAFF |
+| GET | `/api/students/{id}` | ADMIN, STUDENT |
+| PUT | `/api/students/{id}` | ADMIN |
+| GET | `/api/students/{id}/academic-history` | ADMIN, STUDENT |
 
-### Pagos
+### Profesores
 | Método | Endpoint | Roles |
 |---|---|---|
-| POST | `/api/pagos/crear-preferencia` | ADMIN |
-| POST | `/api/webhooks/mercadopago` | Público (webhook) |
-| GET | `/api/pagos` | ADMIN |
-| GET | `/api/pagos/{id}` | ADMIN |
+| GET | `/api/professors` | ADMIN, STAFF |
+| GET | `/api/professors/{id}` | ADMIN, PROFESSOR |
+| POST | `/api/professors/{id}/assignments` | ADMIN |
 
-### Restaurants
+### Materias
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/restaurants` | ADMIN |
-| PUT | `/api/restaurants/{id}` | ADMIN |
-| GET | `/api/restaurants/{id}` | ADMIN |
+| GET | `/api/subjects` | Todos |
+| GET | `/api/subjects/{id}` | Todos |
+| POST | `/api/subjects` | ADMIN |
+| PUT | `/api/subjects/{id}` | ADMIN |
+| DELETE | `/api/subjects/{id}` | ADMIN |
 
-### Usuarios
+### Comisiones
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/usuarios` | ADMIN |
-| POST | `/api/usuarios` | ADMIN |
-| PUT | `/api/usuarios/{id}` | ADMIN |
-| DELETE | `/api/usuarios/{id}` | ADMIN |
+| GET | `/api/sections` | Todos |
+| GET | `/api/sections/{id}` | Todos |
+| POST | `/api/sections` | ADMIN |
+| PUT | `/api/sections/{id}` | ADMIN |
+| PATCH | `/api/sections/{id}/status` | ADMIN |
 
-### Categorías
+### Inscripciones
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/categorias` | Todos |
-| POST | `/api/categorias` | ADMIN |
-| PUT | `/api/categorias/{id}` | ADMIN |
-| DELETE | `/api/categorias/{id}` | ADMIN |
+| GET | `/api/enrollments` | ADMIN, STAFF |
+| POST | `/api/enrollments` | STUDENT, ADMIN |
+| GET | `/api/enrollments/student/{studentId}` | STUDENT, ADMIN |
+| DELETE | `/api/enrollments/{id}` | STUDENT, ADMIN |
 
-### Productos
+### Asistencias
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/productos` | Todos |
-| GET | `/api/productos/{id}` | Todos |
-| POST | `/api/productos` | ADMIN |
-| PUT | `/api/productos/{id}` | ADMIN |
-| DELETE | `/api/productos/{id}` | ADMIN |
-| GET | `/api/productos/categoria/{categoriaId}` | Todos |
-| PUT | `/api/productos/{id}/disponibilidad` | ADMIN |
+| GET | `/api/attendances/session/{sessionId}` | PROFESSOR, ADMIN |
+| POST | `/api/attendances` | PROFESSOR, ADMIN |
+| GET | `/api/attendances/student/{studentId}` | STUDENT, ADMIN |
 
-### Mesas
+### Exámenes y Notas
 | Método | Endpoint | Roles |
 |---|---|---|
-| GET | `/api/mesas` | Todos |
-| POST | `/api/mesas` | ADMIN |
-| PUT | `/api/mesas/{id}` | ADMIN |
-| DELETE | `/api/mesas/{id}` | ADMIN |
-| PATCH | `/api/mesas/{id}/estado` | MOZO, ADMIN |
-
-### Pedidos
-| Método | Endpoint | Roles |
-|---|---|---|
-| GET | `/api/pedidos` | Todos |
-| POST | `/api/pedidos` | MOZO, ADMIN |
-| GET | `/api/pedidos/{id}` | Todos |
-| PUT | `/api/pedidos/{id}/estado` | MOZO, ADMIN |
-| GET | `/api/pedidos/activos` | MOZO, COCINERO |
-| GET | `/api/pedidos/mozo/{usuarioId}` | ADMIN, MOZO |
-
-### Reservas
-| Método | Endpoint | Roles |
-|---|---|---|
-| GET | `/api/reservas` | ADMIN |
-| POST | `/api/reservas` | Público (clientes) |
-| PUT | `/api/reservas/{id}` | ADMIN |
-| DELETE | `/api/reservas/{id}` | ADMIN |
-| GET | `/api/reservas/disponibilidad` | Público |
-
-### Reportes
-| Método | Endpoint | Roles |
-|---|---|---|
-| GET | `/api/reportes/ventas-diarias` | ADMIN |
-| GET | `/api/reportes/ventas-semanales` | ADMIN |
-| GET | `/api/reportes/ventas-mensuales` | ADMIN |
-| GET | `/api/reportes/productos-mas-vendidos` | ADMIN |
-| GET | `/api/reportes/mesas-mas-ocupadas` | ADMIN |
-| GET | `/api/reportes/reservas` | ADMIN |
-| GET | `/api/reportes/ingresos-por-metodo` | ADMIN |
-| GET | `/api/reportes/empleados-destacados` | ADMIN |
+| GET | `/api/grades/student/{studentId}` | STUDENT, ADMIN |
+| POST | `/api/grades` | PROFESSOR, ADMIN |
+| PUT | `/api/grades/{id}` | PROFESSOR, ADMIN |
 
 ---
 
 ## Seguridad
 
-- **JWT (JSON Web Token)**: generado en login con expiración de 24 horas (configurable)
-- **Roles**: ADMIN, MOZO, COCINERO, CAJERO
+- **JWT (JSON Web Token)**: generado en login con expiración de 24 horas
+- **Roles**: ADMIN, STUDENT, PROFESSOR, STAFF
 - **Protección de endpoints**: mediante `@PreAuthorize` en los controladores
 - **Contraseñas**: encriptadas con BCrypt (Spring Security)
 - **CORS**: configurable para permitir peticiones del frontend en desarrollo
@@ -272,87 +231,119 @@ Los límites se validan en la capa de servicio al crear/editar mesas y usuarios.
 
 | Tipo | Ejemplos |
 |---|---|
-| Públicos | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/planes`, `POST /api/reservas` |
-| Requieren JWT | `GET /api/pedidos`, `POST /api/productos`, etc. |
-| Requieren rol específico | `POST /api/usuarios` (solo ADMIN), `POST /api/pedidos` (MOZO o ADMIN) |
-
----
-
-## Integración con Mercado Pago
-
-Flujo de suscripción paga:
-
-```
-1. Admin selecciona un plan (ej: PREMIUM)
-2. Backend crea Suscripcion (estado: PENDIENTE) + Pago (estado: PENDIENTE)
-3. Backend genera una Preference en Mercado Pago con los datos del plan
-4. Backend devuelve el preference_id y el init_point al frontend
-5. Frontend redirige al checkout de Mercado Pago
-6. Cliente completa el pago en el entorno de MP
-7. MP envía un webhook a POST /api/webhooks/mercadopago
-8. Backend procesa el webhook:
-   a. Guarda la notificación en NotificacionWebhook
-   b. Actualiza el Pago con payment_id y mp_status
-   c. Si mp_status = "approved", la Suscripcion pasa a ACTIVA
-9. Tarea programada (@Scheduled) verifica suscripciones próximas a vencer
-   y las desactiva automáticamente
-```
+| Públicos | `POST /api/auth/register`, `POST /api/auth/login` |
+| Requieren JWT | `GET /api/students`, `POST /api/enrollments`, etc. |
+| Requieren rol específico | `POST /api/subjects` (solo ADMIN), `POST /api/grades` (PROFESSOR o ADMIN) |
 
 ---
 
 ## Estructura del Proyecto
 
 ```
-SAAS-Restaurant-Management/
+University-Management/
 ├── pom.xml
 ├── README.md
 ├── Requisitos.md
 ├── .gitignore
 ├── src/
-│   └── main/
-│       ├── java/com/restaurant/
-│       │   ├── RestaurantApplication.java
-│       │   ├── config/
-│       │   │   ├── SecurityConfig.java
-│       │   │   ├── SwaggerConfig.java
-│       │   │   └── CorsConfig.java
-│       │   ├── auth/
-│       │   │   ├── AuthController.java
-│       │   │   ├── AuthService.java
-│       │   │   ├── JwtUtil.java
-│       │   │   ├── JwtFilter.java
-│       │   │   └── dto/ (LoginRequest, RegisterRequest, TokenResponse)
-│       │   ├── entity/
-│       │   │   ├── Plan.java
-│       │   │   ├── Suscripcion.java
-│       │   │   ├── Pago.java
-│       │   │   ├── NotificacionWebhook.java
-│       │   │   ├── Restaurant.java
-│       │   │   ├── Usuario.java
-│       │   │   ├── Categoria.java
-│       │   │   ├── Producto.java
-│       │   │   ├── Mesa.java
-│       │   │   ├── Pedido.java
-│       │   │   ├── DetallePedido.java
-│       │   │   ├── Reserva.java
-│       │   │   └── ReservaMesa.java
-│       │   ├── repository/
-│       │   ├── service/
-│       │   ├── controller/
-│       │   ├── dto/
-│       │   │   ├── request/
-│       │   │   └── response/
-│       │   ├── mapper/
-│       │   ├── exception/
-│       │   │   ├── GlobalExceptionHandler.java
-│       │   │   ├── ResourceNotFoundException.java
-│       │   │   ├── BusinessException.java
-│       │   │   └── PlanLimitExceededException.java
-│       │   └── scheduler/
-│       │       └── SuscripcionScheduler.java
-│       └── resources/
-│           ├── application.properties
-│           └── data.sql
+│   ├── main/
+│   │   ├── java/Proyect/UniversityManagement/
+│   │   │   ├── UniversityManagementApplication.java
+│   │   │   ├── controller/
+│   │   │   │   ├── AuthController.java
+│   │   │   │   └── UserController.java
+│   │   │   ├── service/
+│   │   │   │   ├── StudentService.java
+│   │   │   │   ├── ProfessorService.java
+│   │   │   │   ├── SubjectService.java
+│   │   │   │   ├── CourseSectionService.java
+│   │   │   │   ├── EnrollmentService.java
+│   │   │   │   ├── AttendanceService.java
+│   │   │   │   ├── ExamGradeService.java
+│   │   │   │   ├── ScheduleService.java
+│   │   │   │   ├── ClassSessionService.java
+│   │   │   │   ├── DegreeService.java
+│   │   │   │   ├── PrerequisiteService.java
+│   │   │   │   ├── ProfessorAssignmentService.java
+│   │   │   │   ├── PersonService.java
+│   │   │   │   ├── AdministrativeStaffService.java
+│   │   │   │   └── UserAccountService.java
+│   │   │   ├── repository/
+│   │   │   │   ├── StudentRepository.java
+│   │   │   │   ├── ProfessorRepository.java
+│   │   │   │   ├── SubjectRepository.java
+│   │   │   │   ├── CourseSectionRepository.java
+│   │   │   │   ├── EnrollmentRepository.java
+│   │   │   │   ├── AttendanceRepository.java
+│   │   │   │   ├── ExamGradeRepository.java
+│   │   │   │   ├── ScheduleRepository.java
+│   │   │   │   ├── ClassSessionRepository.java
+│   │   │   │   ├── DegreeRepository.java
+│   │   │   │   ├── PrerequisiteRepository.java
+│   │   │   │   ├── ProfessorAssignmentRepository.java
+│   │   │   │   ├── PersonRepository.java
+│   │   │   │   ├── AdministrativeStaffRepository.java
+│   │   │   │   └── UserAccountRepository.java
+│   │   │   ├── model/
+│   │   │   │   ├── PersonEntity.java
+│   │   │   │   ├── StudentEntity.java
+│   │   │   │   ├── ProfessorEntity.java
+│   │   │   │   ├── AdministrativeStaffEntity.java
+│   │   │   │   ├── UserAccountEntity.java
+│   │   │   │   ├── DegreeEntity.java
+│   │   │   │   ├── SubjectEntity.java
+│   │   │   │   ├── PrerequisiteEntity.java
+│   │   │   │   ├── CourseSectionEntity.java
+│   │   │   │   ├── ScheduleEntity.java
+│   │   │   │   ├── ClassSessionEntity.java
+│   │   │   │   ├── ProfessorAssignmentEntity.java
+│   │   │   │   ├── EnrollmentEntity.java
+│   │   │   │   ├── AttendanceEntity.java
+│   │   │   │   └── ExamGradeEntity.java
+│   │   │   ├── enums/
+│   │   │   │   ├── AcademicCondition.java
+│   │   │   │   ├── AccountStatus.java
+│   │   │   │   ├── DayOfWeek.java
+│   │   │   │   ├── DedicationType.java
+│   │   │   │   ├── EnrollmentStatus.java
+│   │   │   │   ├── ExamType.java
+│   │   │   │   ├── Gender.java
+│   │   │   │   ├── ProfessorCategory.java
+│   │   │   │   ├── RequirementType.java
+│   │   │   │   ├── SectionRole.java
+│   │   │   │   ├── SectionStatus.java
+│   │   │   │   ├── Shift.java
+│   │   │   │   ├── StudentStatus.java
+│   │   │   │   ├── SystemRol.java
+│   │   │   │   └── TermType.java
+│   │   │   ├── dto/
+│   │   │   │   ├── request/
+│   │   │   │   │   ├── CreatePersonDTO.java
+│   │   │   │   │   ├── EnrollmentRequestDTO.java
+│   │   │   │   │   ├── LoginRequestDTO.java
+│   │   │   │   │   ├── OpenSectionDTO.java
+│   │   │   │   │   └── SubmitGradeDTO.java
+│   │   │   │   └── response/
+│   │   │   │       ├── AcademicHistoryDTO.java
+│   │   │   │       ├── OpenSectionResponseDTO.java
+│   │   │   │       ├── PersonResponseDTO.java
+│   │   │   │       ├── StudentProfileDTO.java
+│   │   │   │       ├── SubjectDetailDTO.java
+│   │   │   │       └── TokenResponseDTO.java
+│   │   │   ├── mapper/
+│   │   │   │   ├── StudentMapper.java
+│   │   │   │   ├── SubjectMapper.java
+│   │   │   │   └── EnrollmentMapper.java
+│   │   │   └── exception/
+│   │   │       ├── GlobalExceptionHandler.java
+│   │   │       ├── ResourceNotFoundException.java
+│   │   │       ├── BusinessException.java
+│   │   │       └── DuplicateEntityException.java
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/
+│       └── java/Proyect/UniversityManagement/
+│           └── RestaurantManagementApplicationTests.java
 └── target/
 ```
 
@@ -362,26 +353,26 @@ SAAS-Restaurant-Management/
 
 ### Prerrequisitos
 
-- Java 17+ instalado
+- Java 26 instalado
 - MySQL 8.x instalado y corriendo
-- Maven (o usar el Maven Wrapper incluido)
+- Maven (o usar el Maven Wrapper incluido: `mvnw.cmd`)
 
 ### Pasos
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/Sebastian-Ruhl/SAAS-Restaurant-Management.git
-   cd SAAS-Restaurant-Management
+   git clone https://github.com/Sebastian-Ruhl/University-Management.git
+   cd University-Management
    ```
 
 2. Crear la base de datos en MySQL:
    ```sql
-   CREATE DATABASE saas_restaurant;
+   CREATE DATABASE university_db;
    ```
 
 3. Configurar las credenciales en `src/main/resources/application.properties`:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/saas_restaurant
+   spring.datasource.url=jdbc:mysql://localhost:3306/university_db?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&allowPublicKeyRetrieval=true
    spring.datasource.username=root
    spring.datasource.password=tu_contraseña
    ```
@@ -391,7 +382,7 @@ SAAS-Restaurant-Management/
    ./mvnw spring-boot:run
    ```
 
-5. Acceder a Swagger UI:
+5. Acceder a Swagger UI (cuando esté configurado):
    ```
    http://localhost:8080/swagger-ui.html
    ```
@@ -400,12 +391,12 @@ SAAS-Restaurant-Management/
 
 ## Integrantes
 
-| Nombre | Rol en el proyecto |
-|---|---|
-| **Sebastian Ruhl** | |
-| **Francisco Macchiavello** | |
-| **Mariano Lumbreras** | |
-| **Santino Cataldo** | |
+| Nombre |
+|---|
+| **Sebastian Ruhl** |
+| **Francisco Macchiavello** |
+| **Mariano Lumbreras** |
+| **Santino Cataldo** |
 
 ---
 

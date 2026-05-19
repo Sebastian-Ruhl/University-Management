@@ -1,7 +1,48 @@
 package Proyect.UniversityManagement.model;
 
-import jakarta.persistence.Entity;
+import Proyect.UniversityManagement.enums.StudentStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "alumno")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StudentEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "id_persona", unique = true, nullable = false)
+    private PersonEntity persona;
+
+    @Column(unique = true, nullable = false)
+    private String legajo;
+
+    @Column(name = "fecha_ingreso")
+    private LocalDate fechaIngreso;
+
+    @Column(name = "fecha_egreso")
+    private LocalDate fechaEgreso;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_alumno", nullable = false)
+    private StudentStatus estadoAlumno;
+
+    @OneToMany(mappedBy = "alumno")
+    private List<EnrollmentEntity> inscripciones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "alumno")
+    private List<ExamGradeEntity> notasExamen = new ArrayList<>();
+
+    @OneToMany(mappedBy = "alumno")
+    private List<AttendanceEntity> asistencias = new ArrayList<>();
 }
